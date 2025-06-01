@@ -2,8 +2,14 @@ using AuthServiceLibrary.Application.Requests;
 using AuthServiceLibrary.Application.Services;
 using AuthServiceLibrary.Domain.Interfaces;
 using AuthServiceLibrary.Infrastructure.Data;
-using AuthServiceLibrary.Infrastructure.Repositories;
+using BookServiceLibrary.Application.Requests;
+using BookServiceLibrary.Application.Services;
+using BookServiceLibrary.Domain.Interfaces;
+using BookServiceLibrary.Infrastructure.Data;
+using BookServiceLibrary.Infrastructure.Repositories;
+using Elastic.Clients.Elasticsearch;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -15,7 +21,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 // Jwt
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -39,25 +44,40 @@ builder.Services.AddAuthorization();
 
 
 // Dependency injection
-builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IBooksRepository, BooksRepository>();
 builder.Services.AddScoped<MongoDBService>();
-builder.Services.AddScoped<UserSupportForUsers>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserSupport, UserSupport>();
+builder.Services.AddScoped<IBookSearchService, BookSearchService>();
+builder.Services.AddScoped<IBooksRepository, BooksRepository>();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddHttpClient();
 
 
 //Mediator
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(CreateUserRequest).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(CreateBookRequest).Assembly);
 });
 
 
 // Mapp settings
-builder.Services.AddAutoMapper(typeof(UserProfile));
+builder.Services.AddAutoMapper(typeof(BookProfile));
 
 
+//Elasticsearch Config
+builder.Services.Configure<ElasticsearchSettings>(builder.Configuration.GetSection("Elasticsearch"));
+
+builder.Services.AddScoped(sp =>
+{
+    var uri = sp.GetRequiredService<IOptions<ElasticsearchSettings>>().Value.Uri;
+    return new ElasticsearchClient(new Uri(uri));
+});
+
+// Конфигурация Redis
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+});
 
 var app = builder.Build();
 

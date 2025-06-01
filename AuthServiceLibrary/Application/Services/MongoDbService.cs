@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AuthServiceLibrary.Domain.Interfaces;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AuthServiceLibrary.Application.Services
 {
-    public class MongoDBService
+    public class MongoDBService 
     {
         private readonly IMongoDatabase _database;
 

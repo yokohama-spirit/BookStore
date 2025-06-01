@@ -16,6 +16,7 @@ namespace AuthServiceLibrary.Domain.Entities
         public required string UserName { get; set; }
         public required string Password { get; set; }
         public required string Email { get; set; }
+        public decimal Balance { get; set; } = 0;
 
     }
 }
