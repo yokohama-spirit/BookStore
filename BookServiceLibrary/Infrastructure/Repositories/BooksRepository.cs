@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using AuthServiceLibrary.Domain.Entities;
 using Elastic.Clients.Elasticsearch.Security;
 using User = AuthServiceLibrary.Domain.Entities.User;
+using RabbitMQ.Client;
 
 namespace BookServiceLibrary.Infrastructure.Repositories
 {
@@ -23,20 +24,21 @@ namespace BookServiceLibrary.Infrastructure.Repositories
     {
         private readonly IMongoCollection<Book> _books;
         private readonly IMongoCollection<BookBuy> _booksbuy;
-        private readonly IMongoCollection<User> _users;
         private readonly IUserSupport _support;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConnection _rabbitMqConnection;
 
         public BooksRepository
             (MongoDBService mongoDBService,
             IUserSupport support,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            IConnection rabbitMqConnection)
         {
             _books = mongoDBService.GetCollection<Book>("Books");
             _booksbuy = mongoDBService.GetCollection<BookBuy>("BooksBuy");
-            _users = mongoDBService.GetCollection<User>("Users");
             _support = support;
             _httpClientFactory = httpClientFactory;
+            _rabbitMqConnection = rabbitMqConnection;
         }
 
         public async Task BuyBook(string bookId, int amount)
@@ -78,9 +80,27 @@ namespace BookServiceLibrary.Infrastructure.Repositories
                         book.Amount -= amount;
                         await _books.ReplaceOneAsync(b => b.Id == bookId, book);
 
+                        var info = new UserOrderInfo
+                        {
+                            SummaryPrice = summaryPrice,
+                            UserId = myId
+                        };
 
-                        response.Balance -= summaryPrice;
-                        await _users.ReplaceOneAsync(u => u.Id == myId, response);
+                        using var channel = _rabbitMqConnection.CreateModel();
+                        channel.QueueDeclare(queue: "edit_user_balance",
+                                             durable: false,
+                                             exclusive: false,
+                                             autoDelete: false,
+                                             arguments: null);
+
+                        var message = JsonSerializer.Serialize(info);
+                        var body = Encoding.UTF8.GetBytes(message);
+
+                        channel.BasicPublish(exchange: "",
+                                             routingKey: "edit_user_balance",
+                                             basicProperties: null,
+                                             body: body);
+
                     }
 
                 }

@@ -5,6 +5,7 @@ using AuthServiceLibrary.Infrastructure.Data;
 using AuthServiceLibrary.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,10 +41,11 @@ builder.Services.AddAuthorization();
 
 // Dependency injection
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddScoped<MongoDBService>();
+builder.Services.AddSingleton<MongoDBService>();
 builder.Services.AddScoped<UserSupportForUsers>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHostedService<RabbitMQConsumerService>();
 
 
 
@@ -58,6 +60,17 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddAutoMapper(typeof(UserProfile));
 
 
+var factory = new ConnectionFactory { HostName = "localhost" };
+var connection = factory.CreateConnection();
+var channel = connection.CreateModel();
+
+
+channel.QueueDeclare(
+    queue: "edit_user_balance",
+    durable: false,
+    exclusive: false,
+    autoDelete: false,
+    arguments: null);
 
 var app = builder.Build();
 

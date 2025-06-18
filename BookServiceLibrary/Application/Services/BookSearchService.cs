@@ -69,13 +69,6 @@ namespace BookServiceLibrary.Application.Services
 
             List<Book> products = await SearchByProductDataAsync(query);
 
-            if (products.Count == 0 && Guid.TryParse(query, out _)) 
-            {
-                var productById = await SearchByIdAsync(query);
-                if (productById != null)
-                    products.Add(productById);
-            }
-
 
             if (products.Count > 0)
             {
@@ -119,18 +112,16 @@ namespace BookServiceLibrary.Application.Services
                 .Size(100)
             );
 
-            return response.Documents.ToList();
+            if (!response.IsValidResponse || response.Documents == null)
+            {
+                return new List<Book>();
+            }
+            else
+            {
+                return response.Documents.ToList();
+            }
+            
         }
-
-
-        private async Task<Book?> SearchByIdAsync(string id)
-        {
-            var response = await _elasticClient.GetAsync<Book>(id, idx => idx.Index(_indexName));
-            return response.Source;
-        }
-
-
-
 
     }
 }

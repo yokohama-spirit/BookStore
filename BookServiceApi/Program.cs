@@ -11,6 +11,7 @@ using Elastic.Clients.Elasticsearch;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using RabbitMQ.Client;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,6 +73,19 @@ builder.Services.AddScoped(sp =>
     var uri = sp.GetRequiredService<IOptions<ElasticsearchSettings>>().Value.Uri;
     return new ElasticsearchClient(new Uri(uri));
 });
+
+
+// RabbitMQ congif
+var rabbitMqConnection = new ConnectionFactory
+{
+    HostName = "localhost"
+}.CreateConnection();
+
+builder.Services.AddSingleton(rabbitMqConnection);
+
+
+
+
 
 // Конфигурация Redis
 builder.Services.AddStackExchangeRedisCache(options =>
