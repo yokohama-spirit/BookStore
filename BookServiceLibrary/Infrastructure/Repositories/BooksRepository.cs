@@ -17,6 +17,7 @@ using AuthServiceLibrary.Domain.Entities;
 using Elastic.Clients.Elasticsearch.Security;
 using User = AuthServiceLibrary.Domain.Entities.User;
 using RabbitMQ.Client;
+using System.Net;
 
 namespace BookServiceLibrary.Infrastructure.Repositories
 {
@@ -24,21 +25,35 @@ namespace BookServiceLibrary.Infrastructure.Repositories
     {
         private readonly IMongoCollection<Book> _books;
         private readonly IMongoCollection<BookBuy> _booksbuy;
+        private readonly IMongoCollection<Recommended> _reco;
+        private readonly IMongoCollection<Unrecommended> _unreco;
         private readonly IUserSupport _support;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConnection _rabbitMqConnection;
+        private readonly ElasticsearchClient _elasticClient;
 
         public BooksRepository
             (MongoDBService mongoDBService,
             IUserSupport support,
             IHttpClientFactory httpClientFactory,
-            IConnection rabbitMqConnection)
+            IConnection rabbitMqConnection,
+            ElasticsearchClient elasticClient)
         {
             _books = mongoDBService.GetCollection<Book>("Books");
             _booksbuy = mongoDBService.GetCollection<BookBuy>("BooksBuy");
+            _reco = mongoDBService.GetCollection<Recommended>("Recommended");
+            _unreco = mongoDBService.GetCollection<Unrecommended>("Unrecommended");
             _support = support;
             _httpClientFactory = httpClientFactory;
             _rabbitMqConnection = rabbitMqConnection;
+            _elasticClient = elasticClient;
+        }
+
+        public async Task<Book> GetBookByIdAsync(string bookId)
+        {
+            var book = await _books
+                .Find(u => u.Id == bookId).FirstOrDefaultAsync() ?? throw new Exception("Книга не найдена.");
+            return book;
         }
 
         public async Task BuyBook(string bookId, int amount)
@@ -80,6 +95,17 @@ namespace BookServiceLibrary.Infrastructure.Repositories
                         book.Amount -= amount;
                         await _books.ReplaceOneAsync(b => b.Id == bookId, book);
 
+                        var updateResponse = await _elasticClient.UpdateAsync<Book, object>(
+                        "books-index", 
+                        bookId,  
+                        u => u.Doc(new { amount = book.Amount }) 
+                        );
+
+                        if (!updateResponse.IsValidResponse)
+                        {
+                            throw new Exception($"Ошибка обновления: {updateResponse.DebugInformation}");
+                        }
+
                         var info = new UserOrderInfo
                         {
                             SummaryPrice = summaryPrice,
@@ -117,6 +143,103 @@ namespace BookServiceLibrary.Infrastructure.Repositories
         {
             var books = await _books.Find(_ => true).ToListAsync();
             return books;
+        }
+
+        public async Task PutRecommended(string id)
+        {
+            var product = await GetBookByIdAsync(id);
+            var userId = await _support.GetCurrentUserId();
+            var reco = await _reco
+                .Find
+                (r => r.UserId == userId && r.ProductId == id)
+                .FirstOrDefaultAsync();
+
+            if (reco != null)
+            {
+                throw new Exception("Нельзя оценить продукт дважды.");
+            }
+
+            var unreco = await _unreco
+                .Find
+                (r => r.UserId == userId && r.ProductId == id)
+                .FirstOrDefaultAsync();
+
+            if (unreco != null && product.Unrecommended > 0)
+            {
+                product.Unrecommended--;
+                await _books.ReplaceOneAsync(b => b.Id == id, product);
+                await _unreco.DeleteOneAsync(p => p.Id == unreco.Id);
+            }
+
+
+            var rec = new Recommended
+            {
+                UserId = userId,
+                ProductId = id
+            };
+            await _reco.InsertOneAsync(rec);
+            product.Recommended++;
+
+            await _books.ReplaceOneAsync(b => b.Id == id, product);
+
+            var updateResponse = await _elasticClient.UpdateAsync<Book, object>(
+            "books-index",
+            id,
+            u => u.Doc(new { recommended = product.Recommended })
+            );
+
+            if (!updateResponse.IsValidResponse)
+            {
+                throw new Exception($"Ошибка обновления: {updateResponse.DebugInformation}");
+            }
+        }
+
+        public async Task PutUnrecommended(string id)
+        {
+            var product = await GetBookByIdAsync(id);
+            var userId = await _support.GetCurrentUserId();
+            var unreco = await _unreco
+                .Find
+                (r => r.UserId == userId && r.ProductId == id)
+                .FirstOrDefaultAsync();
+
+            if (unreco != null)
+            {
+                throw new Exception("Нельзя оценить продукт дважды.");
+            }
+
+            var reco = await _reco
+                .Find
+                (r => r.UserId == userId && r.ProductId == id)
+                .FirstOrDefaultAsync();
+
+            if (reco != null && product.Recommended > 0)
+            {
+                product.Recommended--;
+                await _reco.DeleteOneAsync(p => p.Id == reco.Id);
+            }
+
+
+            var unr = new Unrecommended
+            {
+                UserId = userId,
+                ProductId = id
+            };
+            await _unreco.InsertOneAsync(unr);
+            product.Unrecommended++;
+
+            await _books.ReplaceOneAsync(b => b.Id == id, product);
+
+            var updateResponse = await _elasticClient.UpdateAsync<Book, object>(
+            "books-index",
+            id,
+            u => u.Doc(new { unrecommended = product.Unrecommended })
+            );
+
+            if (!updateResponse.IsValidResponse)
+            {
+                throw new Exception($"Ошибка обновления: {updateResponse.DebugInformation}");
+            }
         }
     }
 }

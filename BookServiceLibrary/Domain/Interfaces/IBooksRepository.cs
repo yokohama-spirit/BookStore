@@ -11,5 +11,8 @@ namespace BookServiceLibrary.Domain.Interfaces
     {
         Task<IEnumerable<Book>> GetAllAsync();
         Task BuyBook(string bookId,int amount);
+        Task<Book> GetBookByIdAsync(string bookId);
+        Task PutRecommended(string id);
+        Task PutUnrecommended(string id);
     }
 }

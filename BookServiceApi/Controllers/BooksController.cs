@@ -83,5 +83,18 @@ namespace BookServiceApi.Controllers
             }
         }
 
+        [HttpPost("reco/{id}")]
+        public async Task<IActionResult> PutReco(string id)
+        {
+            await _booksRep.PutRecommended(id);
+            return Ok("Оценка поставлена!");
+        }
+
+        [HttpPost("unreco/{id}")]
+        public async Task<IActionResult> PutUnreco(string id)
+        {
+            await _booksRep.PutUnrecommended(id);
+            return Ok("Оценка поставлена!");
+        }
     }
 }

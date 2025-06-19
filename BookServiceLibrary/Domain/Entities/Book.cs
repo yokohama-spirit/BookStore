@@ -19,6 +19,9 @@ namespace BookServiceLibrary.Domain.Entities
         public int ReleaseDate { get; set; }
         public int Amount { get; set; }
 
+        public int Recommended {  get; set; }
+        public int Unrecommended { get; set; }
+
         public string? TraderId { get; set; }
     }
 }
