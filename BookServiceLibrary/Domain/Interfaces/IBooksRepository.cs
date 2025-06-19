@@ -16,5 +16,6 @@ namespace BookServiceLibrary.Domain.Interfaces
         Task PutUnrecommended(string id, string? text = null);
         Task<List<Recommended>> GetFullReco();
         Task<List<Unrecommended>> GetFullUnreco();
+        Task SetDiscount(string bookId, int procent);
     }
 }

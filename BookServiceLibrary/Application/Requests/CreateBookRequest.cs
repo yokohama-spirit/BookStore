@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using BookServiceLibrary.Domain.Entities;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace BookServiceLibrary.Application.Requests
         public required decimal Price { get; set; }
         public required int ReleaseDate { get; set; }
         public required int Amount { get; set; }
+
+        public List<Genre> Genres { get; set; }
 
     }
 }

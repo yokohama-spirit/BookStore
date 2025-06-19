@@ -22,6 +22,8 @@ namespace BookServiceLibrary.Domain.Entities
         public int Recommended {  get; set; }
         public int Unrecommended { get; set; }
 
+        public List<Genre> Genres { get; set; } = new List<Genre>();
+
         public string? TraderId { get; set; }
     }
 }

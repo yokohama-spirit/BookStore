@@ -262,5 +262,34 @@ namespace BookServiceLibrary.Infrastructure.Repositories
         {
             return await _unreco.Find(_ => true).ToListAsync();
         }
+
+        public async Task SetDiscount(string bookId, int procent)
+        {
+            var product = await GetBookByIdAsync(bookId);
+            var myId = await _support.GetCurrentUserId();
+            if(product.TraderId != myId)
+            {
+                throw new Exception("Нельзя изменить чужой товар!");
+            }
+
+            if(procent < 1 || procent >= 100)
+            {
+                throw new Exception("Некорретно введены данные для скидки.");
+            }
+            var discount = product.Price / 100 * procent;
+            product.Price -= discount;
+            await _books.ReplaceOneAsync(b => b.Id == bookId, product);
+
+            var updateResponse = await _elasticClient.UpdateAsync<Book, object>(
+            "books-index",
+            bookId,
+            u => u.Doc(new { price = product.Price })
+            );
+
+            if (!updateResponse.IsValidResponse)
+            {
+                throw new Exception($"Ошибка обновления: {updateResponse.DebugInformation}");
+            }
+        }
     }
 }

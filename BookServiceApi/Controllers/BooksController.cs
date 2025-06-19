@@ -1,11 +1,13 @@
 ﻿using BookServiceLibrary.Application.Requests;
 using BookServiceLibrary.Domain.Interfaces;
 using DnsClient.Protocol;
+using Elastic.Clients.Elasticsearch;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static MongoDB.Driver.WriteConcern;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BookServiceApi.Controllers
 {
@@ -125,6 +127,22 @@ namespace BookServiceApi.Controllers
         {
             var result = await _booksRep.GetFullUnreco();
             return Ok(result);
+        }
+
+        [HttpPatch("disc")]
+        public async Task<IActionResult> SetDiscount
+            ([FromQuery] string b, 
+            [FromQuery] int p)
+        {
+            try
+            {
+                await _booksRep.SetDiscount(b, p);
+                return Ok($"Успешно назначена скидка в {p}%!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Ошибка: {ex}");
+            }
         }
     }
 }
