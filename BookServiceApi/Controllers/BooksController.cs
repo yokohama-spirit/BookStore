@@ -1,9 +1,11 @@
 ﻿using BookServiceLibrary.Application.Requests;
 using BookServiceLibrary.Domain.Interfaces;
+using DnsClient.Protocol;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static MongoDB.Driver.WriteConcern;
 
 namespace BookServiceApi.Controllers
 {
@@ -84,17 +86,45 @@ namespace BookServiceApi.Controllers
         }
 
         [HttpPost("reco/{id}")]
-        public async Task<IActionResult> PutReco(string id)
+        public async Task<IActionResult> PutReco(string id, [FromBody] string? text = null)
         {
-            await _booksRep.PutRecommended(id);
-            return Ok("Оценка поставлена!");
+            try
+            {
+                await _booksRep.PutRecommended(id, text);
+                return Ok("Оценка поставлена!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Ошибка: {ex}");
+            }
         }
 
         [HttpPost("unreco/{id}")]
-        public async Task<IActionResult> PutUnreco(string id)
+        public async Task<IActionResult> PutUnreco(string id, [FromBody] string? text = null)
         {
-            await _booksRep.PutUnrecommended(id);
-            return Ok("Оценка поставлена!");
+            try
+            {
+                await _booksRep.PutUnrecommended(id, text);
+                return Ok("Оценка поставлена!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Ошибка: {ex}");
+            }
+        }
+
+        [HttpGet("checkr")]
+        public async Task<IActionResult> GetRecoById()
+        {
+            var result = await _booksRep.GetFullReco();
+            return Ok(result);
+        }
+
+        [HttpGet("checku")]
+        public async Task<IActionResult> GetUnrecoById()
+        {
+            var result = await _booksRep.GetFullUnreco();
+            return Ok(result);
         }
     }
 }

@@ -145,7 +145,7 @@ namespace BookServiceLibrary.Infrastructure.Repositories
             return books;
         }
 
-        public async Task PutRecommended(string id)
+        public async Task PutRecommended(string id, string? text = null)
         {
             var product = await GetBookByIdAsync(id);
             var userId = await _support.GetCurrentUserId();
@@ -177,6 +177,11 @@ namespace BookServiceLibrary.Infrastructure.Repositories
                 UserId = userId,
                 ProductId = id
             };
+            if (text != null)
+            {
+                rec.Text = text;
+            }
+
             await _reco.InsertOneAsync(rec);
             product.Recommended++;
 
@@ -194,7 +199,7 @@ namespace BookServiceLibrary.Infrastructure.Repositories
             }
         }
 
-        public async Task PutUnrecommended(string id)
+        public async Task PutUnrecommended(string id, string? text = null)
         {
             var product = await GetBookByIdAsync(id);
             var userId = await _support.GetCurrentUserId();
@@ -225,6 +230,12 @@ namespace BookServiceLibrary.Infrastructure.Repositories
                 UserId = userId,
                 ProductId = id
             };
+
+            if(text != null)
+            {
+                unr.Text = text;
+            }
+
             await _unreco.InsertOneAsync(unr);
             product.Unrecommended++;
 
@@ -240,6 +251,16 @@ namespace BookServiceLibrary.Infrastructure.Repositories
             {
                 throw new Exception($"Ошибка обновления: {updateResponse.DebugInformation}");
             }
+        }
+
+        public async Task<List<Recommended>> GetFullReco()
+        {
+            return await _reco.Find(_ => true).ToListAsync();
+        }
+
+        public async Task<List<Unrecommended>> GetFullUnreco()
+        {
+            return await _unreco.Find(_ => true).ToListAsync();
         }
     }
 }
