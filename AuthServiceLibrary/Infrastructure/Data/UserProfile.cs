@@ -1,4 +1,5 @@
 ﻿using AuthServiceLibrary.Application.Requests;
+using AuthServiceLibrary.Application.Requests.Admin;
 using AuthServiceLibrary.Domain.Entities;
 using AutoMapper;
 using System;
@@ -14,6 +15,7 @@ namespace AuthServiceLibrary.Infrastructure.Data
         public UserProfile()
         {
             CreateMap<CreateUserRequest, User>();
+            CreateMap<CreateAdminRequest, User>();
         }
     }
 }

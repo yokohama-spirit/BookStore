@@ -1,6 +1,7 @@
 ﻿using AuthServiceLibrary.Domain.Entities;
 using AuthServiceLibrary.Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -60,6 +61,14 @@ namespace AccountServiceApi.Controllers
             {
                 return BadRequest($"Ошибка: {ex}");
             }
+        }
+
+
+        [Authorize(Roles = "Root")]
+        [HttpGet("ping")]
+        public IActionResult RootCheck()
+        {
+            return Ok("PONG!");
         }
     }
 }

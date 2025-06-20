@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using BookServiceLibrary.Infrastructure.Data.Roles;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace AuthServiceLibrary.Domain.Entities
         public required string Password { get; set; }
         public required string Email { get; set; }
         public decimal Balance { get; set; } = 0;
+        public UserRoles Role { get; set; } = UserRoles.User;
 
     }
 }
