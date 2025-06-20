@@ -8,12 +8,14 @@ using BookServiceLibrary.Domain.Interfaces;
 using BookServiceLibrary.Infrastructure.Data;
 using BookServiceLibrary.Infrastructure.Repositories;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Graph;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json.Serialization;
+using RabbitMQConsumerService = BookServiceLibrary.Application.Services.RabbitMQConsumerService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,10 +49,11 @@ builder.Services.AddAuthorization();
 
 // Dependency injection
 builder.Services.AddScoped<IBooksRepository, BooksRepository>();
-builder.Services.AddScoped<MongoDBService>();
+builder.Services.AddSingleton<MongoDBService>();
 builder.Services.AddScoped<IUserSupport, UserSupport>();
 builder.Services.AddScoped<IBookSearchService, BookSearchService>();
 builder.Services.AddScoped<IBooksRepository, BooksRepository>();
+builder.Services.AddHostedService<RabbitMQConsumerService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 
@@ -75,7 +78,7 @@ builder.Services.AddAutoMapper(typeof(BookProfile));
 //Elasticsearch Config
 builder.Services.Configure<ElasticsearchSettings>(builder.Configuration.GetSection("Elasticsearch"));
 
-builder.Services.AddScoped(sp =>
+builder.Services.AddSingleton(sp =>
 {
     var uri = sp.GetRequiredService<IOptions<ElasticsearchSettings>>().Value.Uri;
     return new ElasticsearchClient(new Uri(uri));
@@ -90,7 +93,15 @@ var rabbitMqConnection = new ConnectionFactory
 
 builder.Services.AddSingleton(rabbitMqConnection);
 
+var channel = rabbitMqConnection.CreateModel();
 
+
+channel.QueueDeclare(
+    queue: "remove_book",
+    durable: false,
+    exclusive: false,
+    autoDelete: false,
+    arguments: null);
 
 
 

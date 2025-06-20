@@ -56,6 +56,20 @@ namespace BookServiceLibrary.Infrastructure.Repositories
             return book;
         }
 
+        public async Task<string> isExists(string bookId)
+        {
+            var book = await _books
+                .Find(u => u.Id == bookId).FirstOrDefaultAsync();
+            if (book != null)
+            {
+                return "Y";
+            }
+            else
+            {
+                return "N";
+            }
+        }
+
         public async Task BuyBook(string bookId, int amount)
         {
             var book = await _books.Find(p => p.Id == bookId)
@@ -73,7 +87,7 @@ namespace BookServiceLibrary.Infrastructure.Repositories
                 {
                     var response = await httpClient.GetFromJsonAsync<User>(
                                         $"{serviceUrl}/api/account/{myId}",
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? throw new HttpRequestException("Продукта не существует.");
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? throw new HttpRequestException("0.0");
 
 
                     var summaryPrice = book.Price * amount;

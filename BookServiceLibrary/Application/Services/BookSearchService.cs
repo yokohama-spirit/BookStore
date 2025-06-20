@@ -94,22 +94,39 @@ namespace BookServiceLibrary.Application.Services
                 .Query(q => q
                     .Bool(b => b
                         .Should(
-                            bs => bs.Fuzzy(f => f
-                                .Field(u => u.Name)
-                                .Value(query)
-                                .Fuzziness(new Fuzziness("AUTO"))
-                                .Transpositions(true)
-                                .PrefixLength(1)),
-                            bs => bs.Fuzzy(f => f
-                                .Field(u => u.AuthorName)
-                                .Value(query)
-                                .Fuzziness(new Fuzziness("AUTO"))
-                                .Transpositions(true)
-                                .PrefixLength(1))
+
+                                      //   SEARCH FOR NAME
+
+            //Prefix Search
+            bs => bs.MatchPhrasePrefix(m => m.Field(f => f.Name).Query(query)),
+            //Fuzzy Search
+            bs => bs.Fuzzy(f => f.Field(f => f.Name).Value(query).Fuzziness(new Fuzziness("AUTO"))),
+            //Wildcard
+            bs => bs.Wildcard(w => w.Field(f => f.Name).Value($"*{query}*")),
+
+
+                                      //   SEARCH FOR AUTHOR NAME
+
+            //Prefix Search
+            bs => bs.MatchPhrasePrefix(m => m.Field(f => f.AuthorName).Query(query)),
+            //Fuzzy Search
+            bs => bs.Fuzzy(f => f.Field(f => f.AuthorName).Value(query).Fuzziness(new Fuzziness("AUTO"))),
+            //Wildcard
+            bs => bs.Wildcard(w => w.Field(f => f.AuthorName).Value($"*{query}*")),
+
+
+                                     //   SEARCH FOR GENRES
+
+            //Prefix Search
+            bs => bs.MatchPhrasePrefix(m => m.Field(f => f.Genres).Query(query)),
+            //Fuzzy Search
+            bs => bs.Fuzzy(f => f.Field(f => f.Genres).Value(query).Fuzziness(new Fuzziness("AUTO"))),
+            //Wildcard
+            bs => bs.Wildcard(w => w.Field(f => f.Genres).Value($"*{query}*"))
                         )
                     )
                 )
-                .Size(100)
+                .Size(150)
             );
 
             if (!response.IsValidResponse || response.Documents == null)

@@ -1,6 +1,7 @@
 using AuthServiceLibrary.Application.Requests;
 using AuthServiceLibrary.Application.Services;
 using AuthServiceLibrary.Domain.Interfaces;
+using AuthServiceLibrary.Domain.Interfaces.Admin;
 using AuthServiceLibrary.Infrastructure.Data;
 using AuthServiceLibrary.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,7 +37,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
 
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOrRoot", policy =>
+        policy.RequireRole("Admin", "Root"));
+});
 
 
 // Dependency injection
@@ -44,8 +49,12 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddSingleton<MongoDBService>();
 builder.Services.AddScoped<UserSupportForUsers>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<RabbitMQConsumerService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
+
 
 
 
@@ -60,8 +69,12 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddAutoMapper(typeof(UserProfile));
 
 
+// RabbitMQ congif
 var factory = new ConnectionFactory { HostName = "localhost" };
 var connection = factory.CreateConnection();
+
+builder.Services.AddSingleton(connection);
+
 var channel = connection.CreateModel();
 
 

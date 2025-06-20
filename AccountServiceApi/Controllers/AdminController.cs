@@ -1,9 +1,11 @@
 ﻿using AuthServiceLibrary.Application.Requests;
 using AuthServiceLibrary.Application.Requests.Admin;
+using AuthServiceLibrary.Domain.Interfaces.Admin;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 
 namespace AccountServiceApi.Controllers
 {
@@ -12,7 +14,14 @@ namespace AccountServiceApi.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public AdminController(IMediator mediator) => _mediator = mediator;
+        private readonly IAdminRepository _rep;
+        public AdminController
+            (IMediator mediator,
+            IAdminRepository rep)
+        {
+            _mediator = mediator;
+            _rep = rep;
+        }
 
 
 
@@ -39,6 +48,23 @@ namespace AccountServiceApi.Controllers
                 return BadRequest($"Ошибка: {ex}");
             }
         }
+
+
+        [Authorize(Policy = "AdminOrRoot")]
+        [HttpDelete("del")]
+        public async Task<IActionResult> RemoveProduct([FromQuery] string p)
+        {
+            try
+            {
+                await _rep.RemoveProduct(p);
+                return Ok("Товар успешно снят с прилавка!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Ошибка: {ex}");
+            }
+        }
+
 
         [Authorize(Roles = "Admin")]
         [HttpGet("ping")]

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace AuthServiceLibrary.Domain.Interfaces.Admin
 {
-    internal interface IAdminRepository
+    public interface IAdminRepository
     {
+        Task RemoveProduct(string productId);
     }
 }

@@ -144,5 +144,19 @@ namespace BookServiceApi.Controllers
                 return BadRequest($"Ошибка: {ex}");
             }
         }
+
+        [HttpGet("hc/{productId}")]
+        public async Task<ActionResult<string>> HealthCheck(string productId)
+        {
+            try
+            {
+                var result = await _booksRep.isExists(productId);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Ошибка: {ex}");
+            }
+        }
     }
 }
