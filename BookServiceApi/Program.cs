@@ -53,9 +53,12 @@ builder.Services.AddSingleton<MongoDBService>();
 builder.Services.AddScoped<IUserSupport, UserSupport>();
 builder.Services.AddScoped<IBookSearchService, BookSearchService>();
 builder.Services.AddScoped<IBooksRepository, BooksRepository>();
+builder.Services.AddScoped<IRecoService, RecoService>();
 builder.Services.AddHostedService<RabbitMQConsumerService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
+
+
 
 //Enum to string converter xd
 builder.Services.AddControllers()

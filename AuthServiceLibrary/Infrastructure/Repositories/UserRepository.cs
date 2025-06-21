@@ -31,6 +31,11 @@ namespace AuthServiceLibrary.Infrastructure.Repositories
             await _users.ReplaceOneAsync(u => u.Id == userId, user);
         }
 
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _users.Find(_ => true).ToListAsync();
+        }
+
         public async Task<decimal> GetMyBalanceAsync()
         {
             var userId = await _support.GetCurrentUserId();

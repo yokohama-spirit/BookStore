@@ -9,5 +9,7 @@ namespace AuthServiceLibrary.Domain.Interfaces.Admin
     public interface IAdminRepository
     {
         Task RemoveProduct(string productId);
+        Task SetAdminRoleAsync(string userId);
+        Task RemoveAdminRoleAsync(string userId);
     }
 }

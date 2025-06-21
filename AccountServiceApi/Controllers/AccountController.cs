@@ -63,6 +63,12 @@ namespace AccountServiceApi.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _rep.GetAllUsersAsync();
+            return Ok(users);
+        }
 
         [Authorize(Roles = "Root")]
         [HttpGet("ping")]

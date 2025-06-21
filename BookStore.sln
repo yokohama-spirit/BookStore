@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountServiceApi", "AccountServiceApi\AccountServiceApi.csproj", "{2149C15D-E656-4BF9-9235-E3CEC5E2ADA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountServiceApi", "AccountServiceApi\AccountServiceApi.csproj", "{2149C15D-E656-4BF9-9235-E3CEC5E2ADA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServiceLibrary", "AuthServiceLibrary\AuthServiceLibrary.csproj", "{AD814A6E-D577-477B-B63E-15E0F9A21919}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthServiceLibrary", "AuthServiceLibrary\AuthServiceLibrary.csproj", "{AD814A6E-D577-477B-B63E-15E0F9A21919}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookServiceLibrary", "BookServiceLibrary\BookServiceLibrary.csproj", "{0619C10C-C037-4C71-B6EB-8092DE259E5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookServiceLibrary", "BookServiceLibrary\BookServiceLibrary.csproj", "{0619C10C-C037-4C71-B6EB-8092DE259E5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookServiceApi", "BookServiceApi\BookServiceApi.csproj", "{0B963283-C9E2-44D0-8739-E7D9EC9A4217}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookServiceApi", "BookServiceApi\BookServiceApi.csproj", "{0B963283-C9E2-44D0-8739-E7D9EC9A4217}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{FBA777A8-BBF8-4565-B41D-3322CE669832}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{0B963283-C9E2-44D0-8739-E7D9EC9A4217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B963283-C9E2-44D0-8739-E7D9EC9A4217}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B963283-C9E2-44D0-8739-E7D9EC9A4217}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBA777A8-BBF8-4565-B41D-3322CE669832}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBA777A8-BBF8-4565-B41D-3322CE669832}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBA777A8-BBF8-4565-B41D-3322CE669832}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBA777A8-BBF8-4565-B41D-3322CE669832}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

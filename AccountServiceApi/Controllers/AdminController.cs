@@ -23,9 +23,20 @@ namespace AccountServiceApi.Controllers
             _rep = rep;
         }
 
+/*       ⢀⣠⣤⣶⣶⣶⣶⣶⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⣠⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣄⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⣠⣴⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣮⣵⣄⠀⠀⠀
+⠀⠀⢾⣻⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⡀⠀
+⠀⠸⣽⣻⠃⣿⡿⠋⣉⠛⣿⣿⣿⣿⣿⣿⣿⣿⣏⡟⠉⡉⢻⣿⡌⣿⣳⡥⠀
+⠀⢜⣳⡟⢸⣿⣷⣄⣠⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣤⣠⣼⣿⣇⢸⢧⢣⠀                      METHODS FOR ROOT-USER
+⠀⠨⢳⠇⣸⣿⣿⢿⣿⣿⣿⣿⡿⠿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⠀⡟⢆⠀
+⠀⠀⠈⠀⣾⣿⣿⣼⣿⣿⣿⣿⡀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣽⣿⣿⠐⠈⠀⠀
+⠀⢀⣀⣼⣷⣭⣛⣯⡝⠿⢿⣛⣋⣤⣤⣀⣉⣛⣻⡿⢟⣵⣟⣯⣶⣿⣄⡀⠀
+⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣾⣶⣶⣴⣾⣿⣿⣿⣿⣿⣿⢿⣿⣿⣧
+⣿⣿⣿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⣿⡿
+*/
 
 
-        //Метод регистрации
         [Authorize(Roles = "Root")]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] CreateAdminRequest command)
@@ -50,6 +61,38 @@ namespace AccountServiceApi.Controllers
         }
 
 
+        [Authorize(Roles = "Root")]
+        [HttpPost("sa")]
+        public async Task<IActionResult> SetAdminRole([FromQuery] string p)
+        {
+            try
+            {
+                await _rep.SetAdminRoleAsync(p);
+                return Ok("Роль админа успешно назначена!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Ошибка: {ex}");
+            }
+        }
+
+        [Authorize(Roles = "Root")]
+        [HttpPost("ra")]
+        public async Task<IActionResult> RemAdminRole([FromQuery] string p)
+        {
+            try
+            {
+                await _rep.RemoveAdminRoleAsync(p);
+                return Ok("Роль админа успешно снята.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Ошибка: {ex}");
+            }
+        }
+
+                                           // AND FOR ADMINS
+
         [Authorize(Policy = "AdminOrRoot")]
         [HttpDelete("del")]
         public async Task<IActionResult> RemoveProduct([FromQuery] string p)
@@ -63,14 +106,6 @@ namespace AccountServiceApi.Controllers
             {
                 return BadRequest($"Ошибка: {ex}");
             }
-        }
-
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("ping")]
-        public IActionResult AdminCheck()
-        {
-            return Ok("ADMIN PONG!");
         }
 
     }

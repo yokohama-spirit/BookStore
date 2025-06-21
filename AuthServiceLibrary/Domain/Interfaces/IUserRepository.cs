@@ -12,5 +12,6 @@ namespace AuthServiceLibrary.Domain.Interfaces
         Task<User> GetUserByIdAsync(string userId);
         Task BalanceRefill(int amount);
         Task<decimal> GetMyBalanceAsync();
+        Task<IEnumerable<User>> GetAllUsersAsync();
     }
 }

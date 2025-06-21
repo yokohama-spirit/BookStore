@@ -23,29 +23,23 @@ namespace AuthServiceLibrary.Infrastructure.Repositories
         private readonly UserSupportForUsers _support;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConnection _rabbitMqConnection;
-        private readonly IUserRepository _rep;
+        private readonly IMongoCollection<User> _users;
 
         public AdminRepository
             (MongoDBService mongoDBService,
             UserSupportForUsers support,
             IHttpClientFactory httpClientFactory,
-            IConnection rabbitMqConnection,
-            IUserRepository rep)
+            IConnection rabbitMqConnection)
         {
             _support = support;
             _httpClientFactory = httpClientFactory;
             _rabbitMqConnection = rabbitMqConnection;
-            _rep = rep;
+            _users = mongoDBService.GetCollection<User>("Users");
         }
+
 
         public async Task RemoveProduct(string productId)
         {
-            var myId = await _support.GetCurrentUserId();
-            var me = await _rep.GetUserByIdAsync(myId);
-            if(me.Role == UserRoles.User)
-            {
-                throw new Exception("Вы не имеете доступа к данному методу.");
-            }
 
             var httpClient = _httpClientFactory.CreateClient();
             var serviceUrl = "https://localhost:3002";
@@ -89,6 +83,42 @@ namespace AuthServiceLibrary.Infrastructure.Repositories
                 throw new Exception($"Ошибка HTTP запроса: {ex.Message}");
             }
 
+        }
+
+        public async Task SetAdminRoleAsync(string userId)
+        {
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(u => u.Id, userId),
+                Builders<User>.Filter.Eq(u => u.Role, UserRoles.User)
+            );
+
+            var update = Builders<User>.Update.Set(u => u.Role, UserRoles.Admin);
+
+            var result = await _users.UpdateOneAsync(filter, update);
+
+
+            if (result.MatchedCount == 0)
+            {
+                throw new Exception("Пользователь уже администратор/данные введены некорректно.");
+            }
+        }
+
+        public async Task RemoveAdminRoleAsync(string userId)
+        {
+            var filter = Builders<User>.Filter.And(
+                Builders<User>.Filter.Eq(u => u.Id, userId),
+                Builders<User>.Filter.Eq(u => u.Role, UserRoles.Admin) 
+            );
+
+            var update = Builders<User>.Update.Set(u => u.Role, UserRoles.User);
+
+            var result = await _users.UpdateOneAsync(filter, update);
+
+
+            if (result.MatchedCount == 0)
+            {
+                throw new Exception("Пользователь не администратор/данные введены некорректно.");
+            }
         }
     }
 }
