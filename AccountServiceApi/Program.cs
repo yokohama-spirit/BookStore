@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using RabbitMQ.Client;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +68,14 @@ builder.Services.AddMediatR(cfg =>
 
 // Mapp settings
 builder.Services.AddAutoMapper(typeof(UserProfile));
+
+
+//Enum to string converter 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 
 // RabbitMQ congif
