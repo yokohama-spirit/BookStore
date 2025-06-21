@@ -70,11 +70,5 @@ namespace AccountServiceApi.Controllers
             return Ok(users);
         }
 
-        [Authorize(Roles = "Root")]
-        [HttpGet("ping")]
-        public IActionResult RootCheck()
-        {
-            return Ok("PONG!");
-        }
     }
 }
