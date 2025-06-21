@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AuthServiceLibrary.Application.Services
 {
-    public class MongoDBService 
+    public class MongoDBService : IMongoDBService
     {
         private readonly IMongoDatabase _database;
 

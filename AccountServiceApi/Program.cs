@@ -46,7 +46,7 @@ builder.Services.AddAuthorization(options =>
 
 // Dependency injection
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddSingleton<MongoDBService>();
+builder.Services.AddSingleton<IMongoDBService, MongoDBService>();
 builder.Services.AddScoped<UserSupportForUsers>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();

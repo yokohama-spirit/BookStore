@@ -16,7 +16,7 @@ namespace AuthServiceLibrary.Infrastructure.Repositories
         private readonly UserSupportForUsers _support;
 
         public UserRepository
-            (MongoDBService mongoDBService,
+            (IMongoDBService mongoDBService,
             UserSupportForUsers support)
         {
             _users = mongoDBService.GetCollection<User>("Users");

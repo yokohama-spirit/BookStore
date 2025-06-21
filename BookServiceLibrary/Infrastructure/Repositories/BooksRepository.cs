@@ -18,6 +18,7 @@ using Elastic.Clients.Elasticsearch.Security;
 using User = AuthServiceLibrary.Domain.Entities.User;
 using RabbitMQ.Client;
 using System.Net;
+using AuthServiceLibrary.Domain.Interfaces;
 
 namespace BookServiceLibrary.Infrastructure.Repositories
 {
@@ -34,7 +35,7 @@ namespace BookServiceLibrary.Infrastructure.Repositories
         private readonly IBookSearchService _service;
 
         public BooksRepository
-            (MongoDBService mongoDBService,
+            (IMongoDBService mongoDBService,
             IUserSupport support,
             IHttpClientFactory httpClientFactory,
             IConnection rabbitMqConnection,

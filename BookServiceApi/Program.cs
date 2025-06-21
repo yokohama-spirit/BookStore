@@ -49,7 +49,7 @@ builder.Services.AddAuthorization();
 
 // Dependency injection
 builder.Services.AddScoped<IBooksRepository, BooksRepository>();
-builder.Services.AddSingleton<MongoDBService>();
+builder.Services.AddSingleton<IMongoDBService, MongoDBService>();
 builder.Services.AddScoped<IUserSupport, UserSupport>();
 builder.Services.AddScoped<IBookSearchService, BookSearchService>();
 builder.Services.AddScoped<IBooksRepository, BooksRepository>();

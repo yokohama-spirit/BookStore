@@ -19,7 +19,7 @@ namespace AuthServiceLibrary.Application.Services.Admin
         private readonly IMapper _mapper;
 
         public CreateAdminRequestHandle
-            (MongoDBService mongoDBService,
+            (IMongoDBService mongoDBService,
             IMapper mapper)
         {
             _users = mongoDBService.GetCollection<User>("Users");

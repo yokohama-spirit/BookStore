@@ -26,7 +26,7 @@ namespace AuthServiceLibrary.Infrastructure.Repositories
         private readonly IMongoCollection<User> _users;
 
         public AdminRepository
-            (MongoDBService mongoDBService,
+            (IMongoDBService mongoDBService,
             UserSupportForUsers support,
             IHttpClientFactory httpClientFactory,
             IConnection rabbitMqConnection)

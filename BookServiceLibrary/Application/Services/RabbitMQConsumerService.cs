@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using AuthServiceLibrary.Domain.Entities;
 using Elastic.Clients.Elasticsearch;
+using AuthServiceLibrary.Domain.Interfaces;
 
 namespace BookServiceLibrary.Application.Services
 {
@@ -28,7 +29,7 @@ namespace BookServiceLibrary.Application.Services
         public RabbitMQConsumerService
             (IServiceProvider serviceProvider,
             ILogger<RabbitMQConsumerService> logger,
-            MongoDBService mongoDBService,
+            IMongoDBService mongoDBService,
             ElasticsearchClient elasticClient)
         {
             _serviceProvider = serviceProvider;

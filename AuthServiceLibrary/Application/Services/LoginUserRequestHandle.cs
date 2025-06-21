@@ -18,7 +18,7 @@ namespace AuthServiceLibrary.Application.Services
         private readonly IJwtService _service;
 
         public LoginUserRequestHandle
-            (MongoDBService mongoDBService,
+            (IMongoDBService mongoDBService,
             IJwtService service)
         {
             _users = mongoDBService.GetCollection<User>("Users");

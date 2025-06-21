@@ -1,4 +1,5 @@
 ﻿using AuthServiceLibrary.Application.Services;
+using AuthServiceLibrary.Domain.Interfaces;
 using BookServiceLibrary.Domain.Entities;
 using BookServiceLibrary.Domain.Interfaces;
 using Elastic.Clients.Elasticsearch;
@@ -22,7 +23,7 @@ namespace BookServiceLibrary.Application.Services
         private readonly IBooksRepository _rep;
 
         public RecoService
-            (MongoDBService mongoDBService,
+            (IMongoDBService mongoDBService,
             IUserSupport support,
             ElasticsearchClient elasticClient,
             IBooksRepository rep)

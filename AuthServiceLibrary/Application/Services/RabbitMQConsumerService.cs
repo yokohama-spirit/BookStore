@@ -24,7 +24,7 @@ namespace AuthServiceLibrary.Application.Services
         public RabbitMQConsumerService
             (IServiceProvider serviceProvider, 
             ILogger<RabbitMQConsumerService> logger,
-            MongoDBService mongoDBService)
+            IMongoDBService mongoDBService)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;

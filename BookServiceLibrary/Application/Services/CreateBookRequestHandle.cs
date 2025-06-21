@@ -1,4 +1,5 @@
 ﻿using AuthServiceLibrary.Application.Services;
+using AuthServiceLibrary.Domain.Interfaces;
 using AutoMapper;
 using BookServiceLibrary.Application.Requests;
 using BookServiceLibrary.Domain.Entities;
@@ -21,7 +22,7 @@ namespace BookServiceLibrary.Application.Services
         private readonly IBookSearchService _service;
 
         public CreateBookRequestHandle
-            (MongoDBService mongoDBService,
+            (IMongoDBService mongoDBService,
             IMapper mapper,
             IUserSupport support,
             IBookSearchService service)

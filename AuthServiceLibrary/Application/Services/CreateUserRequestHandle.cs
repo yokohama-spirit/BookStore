@@ -20,7 +20,7 @@ namespace AuthServiceLibrary.Application.Services
         private readonly IJwtService _service;
 
         public CreateUserRequestHandle
-            (MongoDBService mongoDBService,
+            (IMongoDBService mongoDBService,
             IMapper mapper,
             IJwtService service)
         {
